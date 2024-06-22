@@ -1,8 +1,7 @@
-import { GameCell } from './game-cell'
-import { GameInfo } from './game-info'
-import styles from './game.module.css'
-import { useGameState } from './use-game-state';
-
+import { GameCell } from "./game-cell";
+import { GameInfo } from "./game-info";
+import styles from "./game.module.css";
+import { useGameState } from "./use-game-state";
 
 export function Game() {
   const {
@@ -12,11 +11,11 @@ export function Game() {
     isDraw,
     resetGame,
     toggleCell,
-    getWinnerCell
+    getWinnerCell,
   } = useGameState();
 
   return (
-    <div className={styles['game']}>
+    <div className={styles["game"]}>
       <GameInfo
         isDraw={isDraw}
         winnerSymbol={winnerSymbol}
@@ -32,7 +31,9 @@ export function Game() {
           />
         ))}
       </div>
-      <button className={styles["reset"]} onClick={resetGame}>Сбросить</button>
+      <button className={styles["reset"]} onClick={resetGame}>
+        Сбросить
+      </button>
     </div>
-  )
+  );
 }
