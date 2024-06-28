@@ -6,12 +6,20 @@ import {
   useGameState,
 } from "../components/game";
 import { Header } from "../components/header";
+import { GameSymbol } from "../components/game/game-symbol";
 
 export default function HomePage() {
-  const [playersCount, setPlayersCount] = useState(2);
+  const [playersCount, setPlayersCount] = useState(4);
 
-  const { cells, currentMove, nextMove, handleCellClick, winnerSequence } =
-    useGameState(playersCount);
+  const {
+    cells,
+    currentMove,
+    nextMove,
+    handleCellClick,
+    handlePlayerTimeOver,
+    winnerSequence,
+    winnerSymbol,
+  } = useGameState(playersCount);
 
   return (
     <div className="bg-slate-50 min-h-screen">
@@ -19,12 +27,17 @@ export default function HomePage() {
       <main className="pt-6 w-max mx-auto">
         <GameTitle playersCount={playersCount} />
         <GameInfo
-          playersCount={playersCount}
           currentMove={currentMove}
+          playersCount={playersCount}
+          onPlayerTimeOver={handlePlayerTimeOver}
+          isWinner={!!winnerSymbol}
           className="mt-4"
         />
+        {winnerSymbol && <GameSymbol symbol={winnerSymbol} />}
+
         <GameField
           winnerSequence={winnerSequence}
+          winnerSymbol={winnerSymbol}
           playersCount={playersCount}
           handleCellClick={handleCellClick}
           cells={cells}

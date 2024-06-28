@@ -41,8 +41,9 @@ const GameGrid = ({ children }) => {
   );
 };
 
-const GameCell = ({ children, onClick, isWinner }) => (
+const GameCell = ({ children, onClick, isWinner, disabled }) => (
   <button
+    disabled={disabled}
     onClick={onClick}
     className={clsx(
       "border border-slate-200 -ml-px -mt-px flex items-center justify-center hover:bg-slate-200",
@@ -60,6 +61,7 @@ export const GameField = ({
   currentMove,
   nextMove,
   winnerSequence,
+  winnerSymbol,
 }) => {
   const actions = (
     <>
@@ -79,9 +81,10 @@ export const GameField = ({
       <GameGrid>
         {cells.map((symbol, index) => (
           <GameCell
+            key={index}
             isWinner={winnerSequence?.includes(index)}
             onClick={() => handleCellClick(index)}
-            key={index}
+            disabled={!!winnerSymbol}
           >
             {symbol && <GameSymbol className="w-5 h-5" symbol={symbol} />}
           </GameCell>

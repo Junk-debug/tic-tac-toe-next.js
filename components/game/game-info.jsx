@@ -4,8 +4,8 @@ import { GameSymbol } from "./game-symbol";
 import { GAME_SYMBOLS } from "./constants";
 import { useEffect, useState } from "react";
 
-const PlayerInfo = ({ playerInfo, isRight, isTimerRunning }) => {
-  const [seconds, setSeconds] = useState(60);
+const PlayerInfo = ({ playerInfo, isRight, isTimerRunning, onTimeOver }) => {
+  const [seconds, setSeconds] = useState(6);
 
   const minutesString = String(Math.floor(seconds / 60)).padStart(2, "0");
   const secondsString = String(seconds % 60).padStart(2, "0");
@@ -21,10 +21,25 @@ const PlayerInfo = ({ playerInfo, isRight, isTimerRunning }) => {
 
       return () => {
         clearInterval(interval);
-        setSeconds(60);
+        setSeconds(6);
       };
     }
   }, [isTimerRunning]);
+
+  useEffect(() => {
+    if (seconds === 0) {
+      onTimeOver();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seconds]);
+
+  const getTimerColor = () => {
+    if (isTimerRunning) {
+      return isWarning ? "text-orange-600" : "text-slate-900";
+    }
+
+    return "text-slate-200";
+  };
 
   return (
     <div
@@ -40,13 +55,7 @@ const PlayerInfo = ({ playerInfo, isRight, isTimerRunning }) => {
 
       <div className="w-px h-6 bg-slate-200" />
 
-      <div
-        className={clsx(
-          "text-lg font-semibold w-[60px]",
-          (isWarning && "text-orange-600") ||
-            (!isTimerRunning && "text-slate-300"),
-        )}
-      >
+      <div className={clsx("text-lg font-semibold w-[60px]", getTimerColor())}>
         {minutesString}:{secondsString}
       </div>
     </div>
@@ -84,7 +93,13 @@ const players = [
   },
 ];
 
-export const GameInfo = ({ className, playersCount, currentMove }) => {
+export const GameInfo = ({
+  className,
+  playersCount,
+  currentMove,
+  isWinner,
+  onPlayerTimeOver,
+}) => {
   return (
     <div
       className={clsx(
@@ -94,7 +109,8 @@ export const GameInfo = ({ className, playersCount, currentMove }) => {
     >
       {players.slice(0, playersCount).map((player, index) => (
         <PlayerInfo
-          isTimerRunning={currentMove === player.symbol}
+          onTimeOver={() => onPlayerTimeOver(player.symbol)}
+          isTimerRunning={currentMove === player.symbol && !isWinner}
           isRight={index % 2 === 1}
           key={player.id}
           playerInfo={player}
