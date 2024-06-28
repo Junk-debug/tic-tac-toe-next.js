@@ -13,7 +13,7 @@ export const Header = () => {
         Play
       </UiButton>
       <button className="ml-auto flex items-center gap-2 text-teal-600">
-        <Profile />
+        <Profile name="Maksim" avatar={undefined} rating={1230} />
         <ArrowDownIcon />
       </button>
     </header>
