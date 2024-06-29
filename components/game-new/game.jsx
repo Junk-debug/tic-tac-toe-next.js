@@ -1,26 +1,39 @@
 import { PLAYERS } from "./constants";
-import { useGameState } from "./model/use-game-state";
 import { BackLink } from "./ui/back-link";
 import { GameCell } from "./ui/game-cell";
 import { GameInfo } from "./ui/game-info";
 import { GameLayout } from "./ui/game-layout";
 import { GameMoveInfo } from "./ui/game-move-info";
-import { GameOverModal } from "./ui/game-over-modal";
 import { GameTitle } from "./ui/game-title";
 import { PlayerInfo } from "./ui/player-info";
+import { GameOverModal } from "./ui/game-over-modal";
+import {
+  GAME_STATE_ACTIONS,
+  gameStateReducer,
+  initGameState,
+} from "./model/game-state-reducer";
+import { getNextMove } from "./model/get-next-move";
+import { computeWinner } from "./model/compute-winner";
+import { computeWinnerSymbol } from "./model/compute-winner-symbol";
+import { useReducer } from "react";
 
 const PLAYERS_COUNT = 2;
 
 export const Game = () => {
-  const {
-    cells,
-    currentMove,
-    nextMove,
-    handleCellClick,
-    handlePlayerTimeOver,
+  const [gameState, dispatch] = useReducer(
+    gameStateReducer,
+    { playersCount: PLAYERS_COUNT },
+    initGameState,
+  );
+
+  const { cells, currentMove, playersCount } = gameState;
+
+  const winnerSequence = computeWinner(gameState);
+  const nextMove = getNextMove(gameState);
+  const winnerSymbol = computeWinnerSymbol(gameState, {
     winnerSequence,
-    winnerSymbol,
-  } = useGameState(PLAYERS_COUNT);
+    nextMove,
+  });
 
   const winnerPlayer = PLAYERS.find((player) => player.symbol === winnerSymbol);
 
@@ -33,10 +46,10 @@ export const Game = () => {
           <GameInfo
             isRatingGame
             timeMode="1 minute per move"
-            playersCount={4}
+            playersCount={playersCount}
           />
         }
-        playersList={PLAYERS.slice(0, PLAYERS_COUNT).map((player, index) => (
+        playersList={PLAYERS.slice(0, playersCount).map((player, index) => (
           <PlayerInfo
             key={player.id}
             name={player.name}
@@ -54,14 +67,19 @@ export const Game = () => {
           <GameCell
             key={index}
             isWinner={winnerSequence?.includes(index)}
-            onClick={() => handleCellClick(index)}
+            onClick={() => {
+              dispatch({
+                type: GAME_STATE_ACTIONS.CELL_CLICK,
+                index,
+              });
+            }}
             disabled={!!winnerSymbol}
             symbol={cell}
           />
         ))}
       />
       <GameOverModal
-        players={PLAYERS.slice(0, PLAYERS_COUNT).map((player, index) => (
+        players={PLAYERS.slice(0, playersCount).map((player, index) => (
           <PlayerInfo
             key={player.id}
             name={player.name}
